@@ -41,6 +41,7 @@ function getImageProps(props) {
 }
 
 const CACHED_IMAGE_REF = 'cachedImage';
+var unsubscribe = null;
 
 class CachedImage extends React.Component {
 
@@ -53,8 +54,8 @@ class CachedImage extends React.Component {
     };
 
     static defaultProps = {
-            renderImage: props => (<ImageBackground imageStyle={props.style} ref={CACHED_IMAGE_REF} {...props} />),
-            activityIndicatorProps: {},
+        renderImage: props => (<ImageBackground imageStyle={props.style} ref={CACHED_IMAGE_REF} {...props} />),
+        activityIndicatorProps: {},
     };
 
     static contextTypes = {
@@ -80,10 +81,11 @@ class CachedImage extends React.Component {
 
     componentWillMount() {
         this._isMounted = true;
-       // Subscribe
-        const unsubscribe = NetInfo.addEventListener(state => {
-          handleConnectivityChange(state.isConnected);
+        // Subscribe
+        unsubscribe = NetInfo.addEventListener(state => {
+            this.handleConnectivityChange(state.isConnected);
         });
+
         this.processSource(this.props.source);
     }
 
@@ -203,7 +205,7 @@ class CachedImage extends React.Component {
             return (
                 <ActivityIndicator
                     {...activityIndicatorProps}
-                    style={[imageStyle, activityIndicatorStyle]}/>
+                    style={[imageStyle, activityIndicatorStyle]} />
             );
         }
         // otherwise render an image with the defaultSource with the ActivityIndicator on top of it
@@ -215,11 +217,11 @@ class CachedImage extends React.Component {
             children: (
                 LoadingIndicator
                     ? <View style={[imageStyle, activityIndicatorStyle]}>
-                    <LoadingIndicator {...activityIndicatorProps} />
-                </View>
+                        <LoadingIndicator {...activityIndicatorProps} />
+                    </View>
                     : <ActivityIndicator
-                    {...activityIndicatorProps}
-                    style={activityIndicatorStyle}/>
+                        {...activityIndicatorProps}
+                        style={activityIndicatorStyle} />
             )
         });
     }
