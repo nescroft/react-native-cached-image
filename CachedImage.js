@@ -80,14 +80,17 @@ class CachedImage extends React.Component {
 
     componentWillMount() {
         this._isMounted = true;
-       NetInfo.addEventListener(this.handleConnectivityChange);
-
+       // Subscribe
+        const unsubscribe = NetInfo.addEventListener(state => {
+          handleConnectivityChange(state.isConnected);
+        });
         this.processSource(this.props.source);
     }
 
     componentWillUnmount() {
         this._isMounted = false;
-        NetInfo.removeEventListener(this.handleConnectivityChange);
+        // Unsubscribe
+        unsubscribe();
     }
 
     componentWillReceiveProps(nextProps) {
